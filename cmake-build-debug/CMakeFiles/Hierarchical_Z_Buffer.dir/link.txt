@@ -1,1 +1,0 @@
-/usr/bin/g++ -g CMakeFiles/Hierarchical_Z_Buffer.dir/src/OctTree.cpp.o CMakeFiles/Hierarchical_Z_Buffer.dir/src/Rasterizer.cpp.o CMakeFiles/Hierarchical_Z_Buffer.dir/src/Triangle.cpp.o CMakeFiles/Hierarchical_Z_Buffer.dir/src/ZBuffer.cpp.o CMakeFiles/Hierarchical_Z_Buffer.dir/src/main.cpp.o -o Hierarchical_Z_Buffer 
