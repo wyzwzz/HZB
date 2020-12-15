@@ -6,5 +6,6 @@
 int main()
 {
     std::cout<<"Hierarchical Z-Buffer"<<std::endl;
-    Displayer displayer;
+    Displayer displayer(1200,900);
+    displayer.render();
 }
