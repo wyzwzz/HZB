@@ -6,21 +6,27 @@
 #define HIERARCHICAL_Z_BUFFER_TRIANGLE_H
 
 #include <glm/glm.hpp>
+#include <array>
 class Triangle {
 public:
     Triangle()=default;
+    Triangle(const glm::vec4& v0,const glm::vec4& v1,const glm::vec4& v2);
 
-    glm::vec4 GetVertex(uint8_t index);
 
-    void SetVertex(uint8_t index,glm::vec4 v);
-    void SetColor(uint8_t index,glm::vec3 c);
-    void SetNormal(uint8_t index,glm::vec3 n);
-    void SetTexCoord(uint8_t index,glm::vec2 t);
+    const glm::vec4& getVertex  (uint8_t index) const;
+    const std::array<glm::vec4,3>& getVertices() const{return vertex;}
+    void setVertex(uint8_t index,const glm::vec3& v);
+    void setVertex(uint8_t index,float x,float y,float z);
+    void setColor(uint8_t index,const glm::vec3& c);
+    void setNormal(uint8_t index,const glm::vec3& n);
+    void setNormal(uint8_t index,float x,float y,float z);
+    void setTexCoord(uint8_t index,const glm::vec2& t);
+    void setTexCoord(uint8_t index,float x,float y);
 private:
-    glm::vec4 vertex[3];
-    glm::vec3 color[3];
-    glm::vec3 normal[3];
-    glm::vec2 tex_coord[3];
+    std::array<glm::vec4,3> vertex;
+    std::array<glm::vec3,3> color;
+    std::array<glm::vec3,3> normal;
+    std::array<glm::vec2,3> tex_coord;
 
 };
 

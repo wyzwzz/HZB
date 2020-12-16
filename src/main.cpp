@@ -7,5 +7,6 @@ int main()
 {
     std::cout<<"Hierarchical Z-Buffer"<<std::endl;
     Displayer displayer(1200,900);
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
     displayer.render();
 }

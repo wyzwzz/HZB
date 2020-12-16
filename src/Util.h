@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include<SDL2/SDL.h>
 #include<iostream>
+#include <chrono>
 inline glm::mat4 GetModelMatrix()
 {
 
@@ -50,6 +51,13 @@ inline glm::mat4 GetProjectionMatrix(T fov,T aspect,T z_naer,T z_far)
 #define SCL_CHECK
 #endif
 
+#define START_TIMER \
+        auto start=std::chrono::steady_clock::now();
 
+
+#define END_TIMER \
+        auto end=std::chrono::steady_clock::now(); \
+        auto t=std::chrono::duration_cast<std::chrono::milliseconds>(end-start);          \
+        std::cout<<"Cost time: "<<t.count()<<"ms"<<std::endl;
 
 #endif //HIERARCHICAL_Z_BUFFER_UTIL_H

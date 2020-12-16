@@ -6,34 +6,53 @@
 #define HIERARCHICAL_Z_BUFFER_RASTERIZER_H
 #include <functional>
 #include <vector>
+#include <tuple>
 #include "Triangle.h"
 #include "Shader.h"
 #include "ZBuffer.h"
 class Rasterizer {
 public:
-    Rasterizer(uint32_t width=800,uint32_t height=600);
+    Rasterizer(uint32_t width=1200,uint32_t height=900);
 
-    void setModel(glm::mat4 model);
-    void setView(glm::mat4 view);
-    void setProjection(glm::mat4 projection);
+    void setModel(const glm::mat4& model);
+    void setView(const glm::mat4& view);
+    void setProjection(const glm::mat4& projection);
+    void addTriangleList(std::tuple<const Triangle*,size_t> triangle);
     void raster();
-    std::vector<unsigned char> getPixels(){return std::move(pixels);}
+    std::vector<uint8_t>& getPixels();
 private:
+    void rasterize(const Triangle& tri);
+private:
+    /**
+     * each element in all_triangles represent a render obj's
+     * triangles array's pointer
+     */
+    std::vector< std::tuple<const Triangle*,size_t> > all_triangles;
+
+    /**
+     * transfer matrix
+     */
     glm::mat4 model,view,projection;
+
     /**
      * Process each fragment's color
      */
     std::function<glm::vec3(fragment_shader_in)> fragment_shader;
+
     /**
      * Process each input vertex
      */
     std::function<glm::vec3(vertex_shader_in)> vertex_shader;
 
+    /**
+     *
+     */
     std::unique_ptr<ZBuffer> zbuffer;
+    std::vector<float> depth_buffer;
     /**
      * Store the final pixels' color (RGBA:0-255)
      */
-    std::vector<unsigned char> pixels;
+    std::vector<uint8_t> pixels;
 
     uint32_t window_w,window_h;
 };

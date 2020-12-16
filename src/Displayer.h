@@ -11,6 +11,7 @@
 #include"Util.h"
 #include"Rasterizer.h"
 #include"Camera.h"
+#include"RenderOBJ.h"
 /**
  * Using SDL2 to create window and display
  */
@@ -21,11 +22,10 @@ public:
             printf("%s - SDL could not initialize! SDL Error: %s\n", __FUNCTION__, SDL_GetError());
             throw std::runtime_error("SDL could not initialize");
         }
-        SDL_EXPR(window=SDL_CreateWindow("Hierarchical Z-Buffer",100,100,1200,900,SDL_WINDOW_SHOWN));
+        SDL_EXPR(window=SDL_CreateWindow("Hierarchical Z-Buffer",100,100,w,h,SDL_WINDOW_SHOWN));
         SDL_EXPR(renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
 
         SDL_CHECK
-
         camera=std::make_unique<Camera>(glm::vec3(0.0f,0.0f,1.0f));
         rasterizer=std::make_unique<Rasterizer>(w,h);
     }
@@ -35,12 +35,15 @@ public:
         SDL_EXPR(SDL_Quit());
     }
 public:
+    void addRenderOBJ(std::string obj_file_name);
     void render();
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;
 
     std::unique_ptr<Camera> camera;
+
+    std::vector<std::unique_ptr<RenderOBJ>> render_obj_list;
     std::unique_ptr<Rasterizer> rasterizer;
 };
 
