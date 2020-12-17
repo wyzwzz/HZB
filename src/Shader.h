@@ -12,18 +12,17 @@ struct vertex_shader_in{
 };
 struct fragment_shader_in{
     glm::vec3 eye_pos;
-    glm::vec3 color;
     glm::vec3 normal;
-    glm::vec3 tex_coord;
+    glm::vec2 tex_coord;
 };
 
-inline glm::vec3 VertexShader(vertex_shader_in& v_in)
+inline glm::vec4 VertexShader(vertex_shader_in v_in)
 {
 
 }
-inline glm::vec3 FragmentShader(fragment_shader_in& f_in)
+inline glm::vec4 FragmentShader(fragment_shader_in f_in)
 {
-
+    return glm::vec4(f_in.normal,1.0f);
 }
 
 #endif //HIERARCHICAL_Z_BUFFER_SHADER_H

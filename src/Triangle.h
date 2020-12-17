@@ -18,10 +18,14 @@ public:
     void setVertex(uint8_t index,const glm::vec3& v);
     void setVertex(uint8_t index,float x,float y,float z);
     void setColor(uint8_t index,const glm::vec3& c);
-    void setNormal(uint8_t index,const glm::vec3& n);
+    const std::array<glm::vec3,3>& getColors() const{return color;}
+    void setNormal(uint8_t index,const glm::vec3& n){ normal[index]=n;}
     void setNormal(uint8_t index,float x,float y,float z);
+    const glm::vec3& getNormal(uint8_t index) const{return normal[index];}
+    const std::array<glm::vec3,3>& getNormals() const{return normal;}
     void setTexCoord(uint8_t index,const glm::vec2& t);
     void setTexCoord(uint8_t index,float x,float y);
+    const std::array<glm::vec2,3>& getTexCoords() const{return tex_coord;}
 private:
     std::array<glm::vec4,3> vertex;
     std::array<glm::vec3,3> color;

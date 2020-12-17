@@ -17,19 +17,29 @@
  */
 class Displayer {
 public:
-    Displayer(uint32_t w,uint32_t h){
+    Displayer(uint32_t w,uint32_t h):w(w),h(h){
         if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ){
             printf("%s - SDL could not initialize! SDL Error: %s\n", __FUNCTION__, SDL_GetError());
             throw std::runtime_error("SDL could not initialize");
         }
         SDL_EXPR(window=SDL_CreateWindow("Hierarchical Z-Buffer",100,100,w,h,SDL_WINDOW_SHOWN));
-        SDL_EXPR(renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
+        SDL_EXPR(renderer=SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED ));
 
         SDL_CHECK
-        camera=std::make_unique<Camera>(glm::vec3(0.0f,0.0f,1.0f));
+
+        camera=std::make_unique<Camera>(glm::vec3(0.0f,0.0f,10.0f));
+
+        /**
+         * init rasterizer
+         * set mode view projection matrix
+         */
         rasterizer=std::make_unique<Rasterizer>(w,h);
+        rasterizer->setModel(glm::mat4(1.0f));
+        rasterizer->setView(camera->getViewMatrix());
+        rasterizer->setProjection(glm::perspective(glm::radians(camera->getZoom()),(float)w/h,0.1f,50.0f));
     }
     ~Displayer(){
+
         SDL_EXPR(SDL_DestroyRenderer(renderer));
         SDL_EXPR(SDL_DestroyWindow(window));
         SDL_EXPR(SDL_Quit());
@@ -39,6 +49,8 @@ public:
     void render();
 private:
     SDL_Window* window;
+    uint32_t w;
+    uint32_t h;
     SDL_Renderer* renderer;
 
     std::unique_ptr<Camera> camera;

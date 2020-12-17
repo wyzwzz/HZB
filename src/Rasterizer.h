@@ -17,6 +17,7 @@ public:
     void setModel(const glm::mat4& model);
     void setView(const glm::mat4& view);
     void setProjection(const glm::mat4& projection);
+    void setViewPos(const glm::vec3& view_pos);
     void addTriangleList(std::tuple<const Triangle*,size_t> triangle);
     void raster();
     std::vector<uint8_t>& getPixels();
@@ -35,14 +36,19 @@ private:
     glm::mat4 model,view,projection;
 
     /**
+     *
+     */
+    glm::vec3 view_pos;
+
+    /**
      * Process each fragment's color
      */
-    std::function<glm::vec3(fragment_shader_in)> fragment_shader;
+    std::function<glm::vec4(fragment_shader_in)> fragment_shader;
 
     /**
      * Process each input vertex
      */
-    std::function<glm::vec3(vertex_shader_in)> vertex_shader;
+    std::function<glm::vec4(vertex_shader_in)> vertex_shader;
 
     /**
      *
@@ -53,6 +59,7 @@ private:
      * Store the final pixels' color (RGBA:0-255)
      */
     std::vector<uint8_t> pixels;
+    void setPixel(int x,int y,glm::vec4 pixel_color);
 
     uint32_t window_w,window_h;
 };

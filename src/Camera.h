@@ -56,6 +56,7 @@ private:
     float zoom;
 public:
     float getZoom(){return zoom;}
+    glm::vec3& getCameraPos(){return pos;}
 };
 inline glm::mat4 Camera::getViewMatrix()
 {
@@ -76,7 +77,7 @@ inline void Camera::processMovementByKeyboard(CameraMoveDirection direction,floa
 }
 inline void Camera::processMouseMovement(float xoffset,float yoffset)
 {
-    std::cout<<__FUNCTION__ <<std::endl;
+//    std::cout<<__FUNCTION__ <<std::endl;
     yaw+=xoffset*mouse_sensitivity;
     pitch+=yoffset*mouse_sensitivity;
     if(pitch>60.0f)
@@ -87,7 +88,7 @@ inline void Camera::processMouseMovement(float xoffset,float yoffset)
 }
 inline void Camera::processMouseScroll(float yoffset)
 {
-    std::cout<<__FUNCTION__ <<std::endl;
+//    std::cout<<__FUNCTION__ <<std::endl;
     zoom-=yoffset;
     if(zoom<0.1f)
         zoom=0.1f;
@@ -96,7 +97,7 @@ inline void Camera::processMouseScroll(float yoffset)
 }
 inline void Camera::processKeyboardForArgs(CameraDefinedKey arg)
 {
-    std::cout<<__FUNCTION__ <<std::endl;
+//    std::cout<<__FUNCTION__ <<std::endl;
     if(arg==CameraDefinedKey::FASTER)
         move_speed*=2;
     else if(arg==CameraDefinedKey::SLOWER)
