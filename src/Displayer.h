@@ -34,7 +34,9 @@ public:
          * set mode view projection matrix
          */
         rasterizer=std::make_unique<Rasterizer>(w,h);
-        rasterizer->setModel(glm::mat4(1.0f));
+
+        float scale=1.0f;
+        rasterizer->setModel(glm::scale(glm::mat4(1.0f),glm::vec3(scale,scale,scale)));
         rasterizer->setView(camera->getViewMatrix());
         rasterizer->setProjection(glm::perspective(glm::radians(camera->getZoom()),(float)w/h,0.1f,50.0f));
     }

@@ -6,7 +6,22 @@
 int main()
 {
     std::cout<<"Hierarchical Z-Buffer"<<std::endl;
-    Displayer displayer(1200,900);
+    Displayer displayer(1024,1024);
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
+    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
     displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
     displayer.render();
 }

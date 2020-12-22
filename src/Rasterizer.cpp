@@ -7,10 +7,10 @@
 #include <omp.h>
 Rasterizer::Rasterizer(uint32_t width, uint32_t height)
 :window_w(width),window_h(height),
- fragment_shader(FragmentShader),vertex_shader(VertexShader)
+ fragment_shader(FragmentShader),vertex_shader(VertexShader),
+ zbuffer(std::make_unique<ZBuffer>(width,height))
 {
-    pixels.assign(window_w*window_h*4,0);
-    depth_buffer.assign(window_h*window_w,-1024.0f);
+    zbuffer->traverseQuadTree();
 
 }
 
@@ -44,16 +44,19 @@ void Rasterizer::raster()
 {
     pixels.assign(window_w*window_h*4,0.f);
     depth_buffer.assign(window_h*window_w,1024.f);
+    zbuffer->init();
+
     float f1=(50.f-0.1f)/2;
     float f2=(50.f+0.1f)/2;
-    auto mvp=projection*view*model;
-    auto inverse_transform=glm::transpose(glm::inverse(view*model));
 
+    auto inverse_transform=glm::transpose(glm::inverse(view*model));
+    int offset=0;
     for(auto e:all_triangles){
         auto tris=std::get<0>(e);
         auto num=std::get<1>(e);
-
-#pragma omp parallel for
+        model=glm::translate(glm::mat4(1.0f),glm::vec3(0.f,0.f,3.f*offset--));
+        auto mvp=projection*view*model;
+//#pragma omp parallel for
         for(size_t i=0;i<num;i++){
             Triangle tri=tris[i];
 //            tri.setNormal(0,tri.getVertex(0));
@@ -99,6 +102,7 @@ void Rasterizer::raster()
             rasterize(tri);
         }
     }
+//    zbuffer->printRootDepth();
 }
 
 std::tuple<float,float,float> computeBarycentric2D(float x, float y, const std::array<glm::vec4,3>& v)
@@ -138,8 +142,12 @@ void Rasterizer::rasterize(const Triangle &tri)
     /**
      * todo: hierarchical z buffer test
      */
+#define ZTEST
+#ifdef ZTEST
 
-
+    if(!zbuffer->ZTest(tri))
+        return;
+#endif
     /**
      * first get the triangle's bounding box
      * second get the intersection of bounding box with the viewport window
@@ -167,13 +175,16 @@ void Rasterizer::rasterize(const Triangle &tri)
                     float modify_alpha=alpha/v[0].w;
                     float modify_beta=beta/v[1].w;
                     float modify_gamma=gamma/v[2].w;
-                    glm::vec3 interpolated_normal=(alpha*normal[0]+beta*normal[1]+gamma*normal[2]);
+                    glm::vec3 interpolated_normal=(modify_alpha*normal[0]+modify_beta*normal[1]+modify_gamma*normal[2])*interpolated_view_space_z;
 
                     glm::vec2 interpolated_texcoord=(modify_alpha*tex_coord[0]+modify_beta*tex_coord[1]+modify_gamma*tex_coord[2])*interpolated_view_space_z;
 
                     auto pixel_color=fragment_shader({view_pos,interpolated_normal,interpolated_texcoord});
                     setPixel(j,i,pixel_color);
                     depth_buffer[(window_h-1-i)*window_w+j]=zp;
+#ifdef ZTEST
+                    zbuffer->setZBuffer(i,j,zp);
+#endif
                 }
             }
         }

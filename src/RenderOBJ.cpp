@@ -32,7 +32,8 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
     auto& attrib = reader.GetAttrib();
     auto& shapes = reader.GetShapes();
     auto& materials = reader.GetMaterials();
-
+//    for(auto& m:materials)
+//        std::cout<<m.name<<std::endl;
     size_t tris_num=0;
     for(size_t s=0;s<shapes.size();s++){
         tris_num+=shapes[s].mesh.num_face_vertices.size();
@@ -73,11 +74,13 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
             }
             triangle_list.push_back(tri);
             index_offset += fv;
+//            std::cout<<shapes[s].mesh.material_ids[f]<<std::endl;
         }
+
     }
     std::cout<<"triangle's num is: "<<triangle_list.size()<<std::endl;
     std::cout<<"finish read obj file: "<<obj_file_path<<std::endl;
-    END_TIMER
+    END_TIMER("Read obj ")
 }
 
 std::tuple<const Triangle*,size_t> RenderOBJ::getTriangleList()

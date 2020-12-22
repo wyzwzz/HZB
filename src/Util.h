@@ -26,6 +26,31 @@ inline glm::mat4 GetProjectionMatrix(T fov,T aspect,T z_naer,T z_far)
     return glm::perspective(fov,aspect,z_naer,z_far);
 }
 
+template<typename T>
+T min4(T x1,T x2,T x3,T x4)
+{
+    T min_=x1;
+    if(x2<min_)
+        min_=x2;
+    if(x3<min_)
+        min_=x3;
+    if(x4<min_)
+        min_=x4;
+    return min_;
+}
+template<typename T>
+T max4(T x1,T x2,T x3,T x4)
+{
+    T max_=x1;
+    if(x2>max_)
+        max_=x2;
+    if(x3>max_)
+        max_=x3;
+    if(x4>max_)
+        max_=x4;
+    return max_;
+}
+
 #define DEBUG
 #ifdef DEBUG
 #define SDL_EXPR(exec) \
@@ -55,9 +80,9 @@ inline glm::mat4 GetProjectionMatrix(T fov,T aspect,T z_naer,T z_far)
         auto start=std::chrono::steady_clock::now();
 
 
-#define END_TIMER \
+#define END_TIMER(fmt) \
         auto end=std::chrono::steady_clock::now(); \
         auto t=std::chrono::duration_cast<std::chrono::milliseconds>(end-start);          \
-        std::cout<<"Cost time: "<<t.count()<<"ms"<<std::endl;
+        std::cout<<fmt<<"cost time: "<<t.count()<<"ms"<<std::endl;
 
 #endif //HIERARCHICAL_Z_BUFFER_UTIL_H
