@@ -19,6 +19,7 @@ public:
     void setProjection(const glm::mat4& projection);
     void setViewPos(const glm::vec3& view_pos);
     void addTriangleList(std::tuple<const Triangle*,size_t> triangle);
+    void buildSceneQctTree();
     void raster();
     std::vector<uint8_t>& getPixels();
 private:
@@ -53,6 +54,7 @@ private:
     /**
      *
      */
+     std::unique_ptr<OctTree> scene;
     std::unique_ptr<ZBuffer> zbuffer;
     std::vector<float> depth_buffer;
     /**

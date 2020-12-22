@@ -40,6 +40,12 @@ void printmat4(const glm::mat4& m)
              <<m[2][0]<<" "<<m[2][1]<<" "<<m[2][2]<<" "<<m[2][3]<<std::endl
              <<m[3][0]<<" "<<m[3][1]<<" "<<m[3][2]<<" "<<m[3][3]<<std::endl;
 }
+
+void Rasterizer::buildSceneQctTree()
+{
+
+}
+
 void Rasterizer::raster()
 {
     pixels.assign(window_w*window_h*4,0.f);
@@ -209,6 +215,8 @@ void Rasterizer::setPixel(int x, int y, glm::vec4 pixel_color)
     pixels[idx+2]=pixel_color.b*255;
     pixels[idx+3]=pixel_color.a*255;
 }
+
+
 
 
 

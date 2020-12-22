@@ -10,7 +10,6 @@
 #include <map>
 #include <glm/glm.hpp>
 #include "Util.h"
-#include "OctTree.h"
 #include <limits>
 #include "Triangle.h"
 class Bound2{
