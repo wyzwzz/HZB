@@ -6,17 +6,18 @@
 #define HIERARCHICAL_Z_BUFFER_RENDEROBJ_H
 #include "Triangle.h"
 #include <string>
-#include <vector>
 #include <tuple>
-class RenderOBJ {
-public:
+#include <vector>
+class RenderOBJ
+{
+  public:
     RenderOBJ(std::string obj_file_path);
 
-    std::tuple<const Triangle*,size_t> getTriangleList();
+    std::tuple<const Triangle *, size_t> getTriangleList();
     void calNormals();
-private:
+
+  private:
     std::vector<Triangle> triangle_list;
 };
 
-
-#endif //HIERARCHICAL_Z_BUFFER_RENDEROBJ_H
+#endif // HIERARCHICAL_Z_BUFFER_RENDEROBJ_H
