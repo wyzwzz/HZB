@@ -8,10 +8,10 @@
 #include <exception>
 #include <iostream>
 #include <tiny_obj_loader.h>
-
+#include <glm/glm.hpp>
 #define OBJ_HAVE_NORMAL
 #define OBJ_HAVE_TEXCOORD
-
+int offset=0;
 RenderOBJ::RenderOBJ(std::string obj_file_path)
 {
     START_TIMER
@@ -86,6 +86,13 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
             index_offset += fv;
             //            std::cout<<shapes[s].mesh.material_ids[f]<<std::endl;
         }
+    }
+    auto model=glm::translate(glm::mat4(1.f),glm::vec3(0.f, 0.f, 3.f * (offset-=1)));
+    for(auto& t:triangle_list){
+        auto& v=t.getVertices();
+        t.setVertex(0,model*v[0]);
+        t.setVertex(1,model*v[1]);
+        t.setVertex(2,model*v[2]);
     }
     std::cout << "triangle's num is: " << triangle_list.size() << std::endl;
     std::cout << "finish read obj file: " << obj_file_path << std::endl;

@@ -19,6 +19,7 @@ class Triangle
         return vertex;
     }
     void setVertex(uint8_t index, const glm::vec3 &v);
+    void setVertex(uint8_t index, const glm::vec4& v);
     void setVertex(uint8_t index, float x, float y, float z);
     void setColor(uint8_t index, const glm::vec3 &c);
     const std::array<glm::vec3, 3> &getColors() const

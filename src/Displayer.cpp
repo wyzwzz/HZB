@@ -100,7 +100,7 @@ void Displayer::render()
     {
         rasterizer->addTriangleList(p->getTriangleList());
     }
-    rasterizer->buildSceneQctTree();
+    rasterizer->buildSceneOctTree();
     /**
      * render loop
      */

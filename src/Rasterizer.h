@@ -27,22 +27,22 @@ class Rasterizer
 
     void addTriangleList(std::tuple<const Triangle *, size_t> triangle);
 
-    void buildSceneQctTree();
+    void buildSceneOctTree();
 
     void raster();
 
     std::vector<uint8_t> &getPixels();
 
   private:
-    void rasterize(const Triangle &tri);
 
+    void rasterize(const Triangle &tri);
+    void raster_node(const OctNode* node,const glm::mat4& mvp);
   private:
     /**
      * each element in all_triangles represent a render obj's
      * triangles array's pointer
      */
     std::vector<std::tuple<const Triangle *, size_t>> all_triangles;
-
     /**
      * transfer matrix
      */
@@ -62,7 +62,7 @@ class Rasterizer
      * Process each input vertex
      */
     std::function<glm::vec4(vertex_shader_in)> vertex_shader;
-
+    std::function<void(const Triangle* tri)> transform_triangle;
     /**
      *
      */

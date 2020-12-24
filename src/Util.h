@@ -46,6 +46,19 @@ template <typename T> T max4(T x1, T x2, T x3, T x4)
     return max_;
 }
 
+template <class T>
+void print(T t)
+{
+    std::cout<<t<<std::endl;
+}
+template <class T,class... Args>
+void print(T t,Args... args)
+{
+    std::cout<<t<<" ";
+    print(args...);
+}
+
+
 #define DEBUG
 #ifdef DEBUG
 #define SDL_EXPR(exec)                                                                                                 \

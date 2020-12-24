@@ -5,6 +5,7 @@
 #include "ZBuffer.h"
 
 ZBuffer::ZBuffer(uint32_t w, uint32_t h)
+:w(w),h(h)
 {
     START_TIMER
     std::vector<std::vector<QuadNode *>> nodes;
@@ -84,6 +85,51 @@ void ZBuffer::traverseQuadTree()
         std::cout << "level:" << i << " has " << book[i] << " node" << std::endl;
     END_TIMER("Traverse quad-tree ")
 }
+bool ZBuffer::ZTest(const Bound2& tri_bound_,float nearest)
+{
+    auto node = root;
+
+    //    std::cout<<node->bound<<std::endl;
+    //    std::cout<<tri_bound<<std::endl;
+//    if (!node->bound.containing(tri_bound))
+//    {
+////                std::cout<<"z-depth passed000"<<std::endl;
+//        return true;
+//    }
+    auto tri_bound=intersection(tri_bound_,glm::vec2(0.f),glm::vec2(w,h));
+    if(tri_bound.isEmpty())
+        return false;
+    while (node != nullptr)
+    {
+        //        std::cout<<node->z_depth<<std::endl;
+        if (node->z_depth < nearest && node->bound.containing(tri_bound))
+        { // not pass
+            //                    std::cout<<root->z_depth<<" "<<node->z_depth<<" "<<nearest<<std::endl;
+            //                    std::cout<<tri_bound<<std::endl;
+//                        std::cout<<"z-depth failed! flag is: "<<node->flag<<std::endl;
+            return false;
+        }
+        else
+        { // test next level
+            int i;
+            for (i = 0; i < 4; i++)
+            {
+                if (node->childs[i] && node->childs[i]->bound.containing(tri_bound))
+                {
+                    node = node->childs[i];
+                    break;
+                }
+            }
+            if (i > 3)
+            {
+//                std::cout<<"z-depth passed! flag is: "<<node->flag<<std::endl;
+                return true;
+            }
+        }
+    }
+    throw std::runtime_error("reach out of z-test iteration");
+}
+
 /**
  * true represent need to rasterize
  */
@@ -92,6 +138,9 @@ bool ZBuffer::ZTest(const Triangle &tri)
     Bound2 tri_bound{tri};
     auto &v = tri.getVertices();
     float nearest = std::min(v[0].z, std::min(v[1].z, v[2].z));
+    return ZTest(tri_bound,nearest);
+
+#ifdef ONE_ZTEST
     auto node = root;
 
     //    std::cout<<node->bound<<std::endl;
@@ -131,6 +180,7 @@ bool ZBuffer::ZTest(const Triangle &tri)
         }
     }
     throw std::runtime_error("reach out of z-test iteration");
+#endif
 }
 
 void ZBuffer::setZBuffer(uint32_t row, uint32_t col, float d)

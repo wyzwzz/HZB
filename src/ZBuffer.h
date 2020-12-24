@@ -57,6 +57,12 @@ class Bound2
            << b.max_point.y;
         return os;
     }
+    bool isEmpty() const{
+        if(min_point.x<max_point.x &&
+            min_point.y<max_point.y)
+            return false;
+        else return true;
+    }
     glm::vec2 min_point, max_point;
 };
 inline Bound2 Union(const Bound2 &b1, const Bound2 &b2, const Bound2 &b3, const Bound2 &b4)
@@ -74,6 +80,11 @@ inline Bound2 Union(const Bound2 &b1, const Bound2 &b2)
     float max_x = std::max(b1.max_point.x, b2.max_point.x);
     float max_y = std::max(b1.max_point.y, b2.max_point.y);
     return {{min_x, min_y}, {max_x, max_y}};
+}
+inline Bound2 intersection(const Bound2& b,const glm::vec2& min_p,const glm::vec2& max_p)
+{
+    return {{std::max(b.min_point.x,min_p.x),std::max(b.min_point.y,min_p.y)},
+            {std::min(b.max_point.x,max_p.x),std::min(b.max_point.y,max_p.y)}};
 }
 class QuadNode
 {
@@ -130,6 +141,7 @@ class ZBuffer
     ZBuffer(uint32_t w, uint32_t h);
 
     bool ZTest(const Triangle &tri);
+    bool ZTest(const Bound2& b,float depth);
     void traverseQuadTree();
     void init();
     void setZBuffer(uint32_t row, uint32_t col, float d);
@@ -147,6 +159,7 @@ class ZBuffer
     }
 
   private:
+    uint32_t w,h;
     void updateZBuffer(const QuadNode *node);
     QuadNode *root;
     std::vector<std::vector<QuadNode *>> reserve_nodes;

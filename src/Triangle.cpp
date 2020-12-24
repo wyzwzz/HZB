@@ -32,3 +32,7 @@ void Triangle::setTexCoord(uint8_t index, float x, float y)
 {
     tex_coord[index] = {x, y};
 }
+void Triangle::setVertex(uint8_t index, const glm::vec4& v)
+{
+    vertex[index]=v;
+}

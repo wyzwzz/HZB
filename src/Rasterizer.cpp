@@ -3,8 +3,8 @@
 //
 
 #include "Rasterizer.h"
-
 #include <omp.h>
+#include <queue>
 
 #include <iostream>
 
@@ -13,7 +13,6 @@ Rasterizer::Rasterizer(uint32_t width, uint32_t height)
       zbuffer(std::make_unique<ZBuffer>(width, height))
 {
     zbuffer->traverseQuadTree();
-
 }
 
 void Rasterizer::setModel(const glm::mat4 &model)
@@ -44,34 +43,254 @@ void printmat4(const glm::mat4 &m)
               << m[3][0] << " " << m[3][1] << " " << m[3][2] << " " << m[3][3] << std::endl;
 }
 
-void Rasterizer::buildSceneQctTree()
+void Rasterizer::buildSceneOctTree()
 {
-    scene=std::make_unique<OctTree>();
-    for(auto& e:all_triangles)
+    START_TIMER
+    scene = std::make_unique<OctTree>();
+
+    for (auto &e : all_triangles)
         scene->addTriangles(e);
     scene->buildOctTree();
+    END_TIMER("build scene Oct tree ")
+    scene->printOctTreeInfo();
 }
+std::tuple<Bound2,float> getBound2AndDepth(const std::vector<glm::vec4>& v)
+{
+    float min_p_x=std::numeric_limits<float>::max();
+    float min_p_y=std::numeric_limits<float>::max();
+    float max_p_x=std::numeric_limits<float>::lowest();
+    float max_p_y=std::numeric_limits<float>::lowest();
+    float depth=0.f;
+    for(auto& p:v)
+    {
+        if(p.x<min_p_x) min_p_x=p.x;
+ ;      if(p.x>max_p_x) max_p_x=p.x;
+        if(p.y<min_p_y) min_p_y=p.y;
+        if(p.y>max_p_y) max_p_y=p.y;
+        if(p.z>depth) depth=p.z;
+    }
+    return { { {min_p_x,min_p_y},{max_p_x,max_p_y} },depth };
+}
+float f1 = (50.f - 0.1f) / 2;
+float f2 = (50.f + 0.1f) / 2;
+size_t draw_tri_num=0;
+size_t draw_leaf_node_num=0;
+void Rasterizer::raster_node(const OctNode* node,const glm::mat4& mvp)
+{
+    auto &min_p = node->bound.getMinP();
+    auto &max_p = node->bound.getMaxP();
 
+
+    std::vector<glm::vec4> v {
+        {min_p,1.f},
+        {max_p.x, min_p.y, min_p.z, 1.f},
+        {min_p.x, max_p.y, min_p.z, 1.f},
+        {max_p.x, max_p.y, min_p.z, 1.f},
+        {min_p.x, min_p.y, max_p.z, 1.f},
+        {max_p.x, min_p.y, max_p.z, 1.f},
+        {min_p.x, max_p.y, max_p.z, 1.f},
+        {max_p, 1.f}
+    };
+
+
+    for(auto& e:v)
+    {
+        e=mvp*e;
+    }
+    int outer_cnt=0;
+    for(auto& p:v)
+    {
+        p.x/=p.w;
+        p.y/=p.w;
+        p.z/=p.w;
+    }
+
+    for(auto& p:v)
+    {
+        p.x=0.5f*window_w*(p.x+1.f);
+        p.y=0.5f*window_h*(p.y+1.f);
+        p.z=p.z*f1+f2;
+    }
+    auto[bound,depth]=getBound2AndDepth(v);
+//        std::cout<<"depth "<<depth<<std::endl;
+    //ZTest: return true represent need to rasterize
+    if(zbuffer->ZTest(bound,depth))
+    {
+//            std::cout<<"node pass ztest"<<std::endl;
+//            std::cout<<bound<<std::endl;
+        if(node->isLeafNode())
+        {
+//                std::cout<<bound<<" "<<depth<<std::endl;
+            draw_tri_num+=node->triangles.size();
+            draw_leaf_node_num++;
+            for(auto triangle : node->triangles)
+            {
+                transform_triangle(triangle);
+            }
+        }
+        else
+        {   //push childs into queue
+//                std::cout<<"pass ztest node is not leaf node"<<std::endl;
+            for(int i=7;i>=0;i--)
+            {
+                if(node->childs[i]!=nullptr)
+                {
+                    raster_node(node->childs[i],mvp);
+                }
+            }
+        }
+    }//end z-test
+}
 void Rasterizer::raster()
 {
     pixels.assign(window_w * window_h * 4, 0.f);
     depth_buffer.assign(window_h * window_w, 1024.f);
     zbuffer->init();
 
-    float f1 = (50.f - 0.1f) / 2;
-    float f2 = (50.f + 0.1f) / 2;
+
 
     auto inverse_transform = glm::transpose(glm::inverse(view * model));
-    int offset = 0;
+
+    auto mvp = projection * view * model;
+    transform_triangle=[this,&mvp](const Triangle* tri)->void
+    {
+        Triangle n_tri=*tri;
+        glm::vec4 v[]={mvp*tri->getVertex(0),
+                       mvp*tri->getVertex(1),
+                       mvp*tri->getVertex(2)};
+        int outer_cnt=0;
+        for(auto& p:v)
+        {
+            p.x /= p.w; // p.w is view space depth-z
+            p.y /= p.w;
+            p.z /= p.w;
+            if (fabs(p.x) > 1.0f || fabs(p.y) > 1.0f || fabs(p.z > 1.0f))
+            {
+                outer_cnt++;
+            }
+        }
+        if (outer_cnt > 2)
+        {
+          // out of view volume, so no need to rasterize
+          return;
+        }
+        for (auto &p : v)
+        {
+          p.x = 0.5f * window_w * (p.x + 1.0f);
+          p.y = 0.5f * window_h * (p.y + 1.0f);
+          p.z = p.z * f1 + f2;
+        }
+        n_tri.setVertex(0, v[0]);
+        n_tri.setVertex(1, v[1]);
+        n_tri.setVertex(2, v[2]);
+        rasterize(n_tri);
+    };
+#define OCTTREE
+#define ZTEST
+#ifdef OCTTREE
+#define ZTEST
+#endif
+
+#ifdef OCTTREE
+#define USE_RECURSIVE
+#ifdef USE_RECURSIVE
+    draw_tri_num=draw_leaf_node_num=0;
+    raster_node(scene->getRoot(),mvp);
+    std::cout<<"draw tri num: "<<draw_tri_num
+             <<" draw leaf node num: "<<draw_leaf_node_num<<std::endl;
+#else
+    std::queue<const OctNode *> task;
+    if (scene->getRoot() == nullptr)
+    {
+        throw std::runtime_error("root is nullptr");
+    }
+    task.push(scene->getRoot());
+    while (!task.empty())
+    {
+        auto node = task.front();
+        task.pop();
+        auto &min_p = node->bound.getMinP();
+        auto &max_p = node->bound.getMaxP();
+
+
+        std::vector<glm::vec4> v {
+            {min_p,1.f},
+            {max_p.x, min_p.y, min_p.z, 1.f},
+            {min_p.x, max_p.y, min_p.z, 1.f},
+            {max_p.x, max_p.y, min_p.z, 1.f},
+            {min_p.x, min_p.y, max_p.z, 1.f},
+            {max_p.x, min_p.y, max_p.z, 1.f},
+            {min_p.x, max_p.y, max_p.z, 1.f},
+            {max_p, 1.f}
+        };
+
+
+        for(auto& e:v)
+        {
+            e=mvp*e;
+        }
+        int outer_cnt=0;
+        for(auto& p:v)
+        {
+            p.x/=p.w;
+            p.y/=p.w;
+            p.z/=p.w;
+        }
+
+        for(auto& p:v)
+        {
+            p.x=0.5f*window_w*(p.x+1.f);
+            p.y=0.5f*window_h*(p.y+1.f);
+            p.z=p.z*f1+f2;
+        }
+        auto[bound,depth]=getBound2AndDepth(v);
+//        std::cout<<"depth "<<depth<<std::endl;
+        //ZTest: return true represent need to rasterize
+        if(zbuffer->ZTest(bound,depth))
+        {
+//            std::cout<<"node pass ztest"<<std::endl;
+//            std::cout<<bound<<std::endl;
+            if(node->isLeafNode())
+            {
+//                std::cout<<bound<<" "<<depth<<std::endl;
+                draw_tri_num+=node->triangles.size();
+                draw_leaf_node_num++;
+                for(auto triangle : node->triangles)
+                {
+                    transform_triangle(triangle);
+                }
+            }
+            else
+            {   //push childs into queue
+//                std::cout<<"pass ztest node is not leaf node"<<std::endl;
+                for(int i=7;i>=0;i--)
+                {
+                    if(node->childs[i]!=nullptr)
+                    {
+                        task.push(node->childs[i]);
+                    }
+                }
+            }
+        }//end z-test
+//        std::cout<<"failed ztest"<<std::endl;
+    }//end while
+    std::cout<<"draw tri num: "<<draw_tri_num
+              <<" draw leaf node num: "<<draw_leaf_node_num<<std::endl;
+#endif
+#else
     for (auto e : all_triangles)
     {
         auto tris = std::get<0>(e);
         auto num = std::get<1>(e);
-        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, 3.f * offset--));
-        auto mvp = projection * view * model;
-        //#pragma omp parallel for
+        //        model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, 3.f * offset--));
+//        auto mvp = projection * view * model;
+        //        #pragma omp parallel for
         for (size_t i = 0; i < num; i++)
         {
+#define USE_LAMBDA
+#ifdef USE_LAMBDA
+            transform_triangle(&tris[i]);
+#else
             Triangle tri = tris[i];
             //            tri.setNormal(0,tri.getVertex(0));
             //            tri.setNormal(1,tri.getVertex(1));
@@ -114,9 +333,11 @@ void Rasterizer::raster()
             //            tri.setNormal(1,n[1]);
             //            tri.setNormal(2,n[2]);
             rasterize(tri);
+#endif
         }
     }
     //    zbuffer->printRootDepth();
+#endif
 }
 
 std::tuple<float, float, float> computeBarycentric2D(float x, float y, const std::array<glm::vec4, 3> &v)
@@ -159,7 +380,7 @@ void Rasterizer::rasterize(const Triangle &tri)
     /**
      * todo: hierarchical z buffer test
      */
-#define ZTEST
+
 #ifdef ZTEST
 
     if (!zbuffer->ZTest(tri))
