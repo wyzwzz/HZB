@@ -87,7 +87,7 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
             //            std::cout<<shapes[s].mesh.material_ids[f]<<std::endl;
         }
     }
-    auto model=glm::translate(glm::mat4(1.f),glm::vec3(0.f, 0.f, 3.f * (offset-=1)));
+    auto model=glm::translate(glm::mat4(1.f),glm::vec3(0.f, 0.f, 3.f * (offset--)));
     for(auto& t:triangle_list){
         auto& v=t.getVertices();
         t.setVertex(0,model*v[0]);

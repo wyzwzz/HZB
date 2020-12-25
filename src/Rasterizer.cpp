@@ -112,6 +112,7 @@ void Rasterizer::raster_node(const OctNode* node,const glm::mat4& mvp)
         p.z=p.z*f1+f2;
     }
     auto[bound,depth]=getBound2AndDepth(v);
+//    std::cout<<"bound "<<bound<<std::endl;
 //        std::cout<<"depth "<<depth<<std::endl;
     //ZTest: return true represent need to rasterize
     if(zbuffer->ZTest(bound,depth))
@@ -158,21 +159,12 @@ void Rasterizer::raster()
         glm::vec4 v[]={mvp*tri->getVertex(0),
                        mvp*tri->getVertex(1),
                        mvp*tri->getVertex(2)};
-        int outer_cnt=0;
+
         for(auto& p:v)
         {
             p.x /= p.w; // p.w is view space depth-z
             p.y /= p.w;
             p.z /= p.w;
-            if (fabs(p.x) > 1.0f || fabs(p.y) > 1.0f || fabs(p.z > 1.0f))
-            {
-                outer_cnt++;
-            }
-        }
-        if (outer_cnt > 2)
-        {
-          // out of view volume, so no need to rasterize
-          return;
         }
         for (auto &p : v)
         {
@@ -185,8 +177,8 @@ void Rasterizer::raster()
         n_tri.setVertex(2, v[2]);
         rasterize(n_tri);
     };
-#define OCTTREE
-#define ZTEST
+//#define OCTTREE
+//#define ZTEST
 #ifdef OCTTREE
 #define ZTEST
 #endif
@@ -229,14 +221,12 @@ void Rasterizer::raster()
         {
             e=mvp*e;
         }
-        int outer_cnt=0;
         for(auto& p:v)
         {
             p.x/=p.w;
             p.y/=p.w;
             p.z/=p.w;
         }
-
         for(auto& p:v)
         {
             p.x=0.5f*window_w*(p.x+1.f);

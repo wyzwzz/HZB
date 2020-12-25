@@ -97,6 +97,8 @@ bool ZBuffer::ZTest(const Bound2& tri_bound_,float nearest)
 //        return true;
 //    }
     auto tri_bound=intersection(tri_bound_,glm::vec2(0.f),glm::vec2(w,h));
+//    std::cout<<"tri_bound "<<tri_bound<<std::endl;
+//    std::cout<<"root bound "<<root->bound<<std::endl;
     if(tri_bound.isEmpty())
         return false;
     while (node != nullptr)
