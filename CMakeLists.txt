@@ -6,7 +6,7 @@ aux_source_directory(${CMAKE_SOURCE_DIR}/src SRC)
 add_executable(Hierarchical_Z_Buffer ${SRC})
 
 target_link_directories(Hierarchical_Z_Buffer PRIVATE ./third_party/sdl2-2.0.3/bin/linux64)
-find_package( OpenMP REQUIRED)
+find_package( OpenMP)
 if(OPENMP_FOUND)
     message("OPENMP FOUND")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")

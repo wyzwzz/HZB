@@ -12,6 +12,7 @@
 #include <tuple>
 #include <vector>
 #include "OctTree.h"
+#include "ScanZBuffer.h"
 class Rasterizer
 {
   public:
@@ -36,7 +37,9 @@ class Rasterizer
   private:
 
     void rasterize(const Triangle &tri);
+
     void raster_node(const OctNode* node,const glm::mat4& mvp);
+
   private:
     /**
      * each element in all_triangles represent a render obj's
@@ -63,11 +66,23 @@ class Rasterizer
      */
     std::function<glm::vec4(vertex_shader_in)> vertex_shader;
     std::function<void(const Triangle* tri)> transform_triangle;
+
+
+
+    /**
+     * scaning-line z-buffer algorithm.
+     * if using this method, get pixel data uising scan_zbuffer->getPixels()
+     */
+    std::unique_ptr<ScanZBuffer> scan_zbuffer;
+
     /**
      *
      */
     std::unique_ptr<OctTree> scene;
     std::unique_ptr<ZBuffer> zbuffer;
+    /**
+     * simple z-buffer
+     */
     std::vector<float> depth_buffer;
     /**
      * Store the final pixels' color (RGBA:0-255)
