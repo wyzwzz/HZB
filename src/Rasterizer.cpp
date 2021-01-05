@@ -10,7 +10,8 @@
 
 Rasterizer::Rasterizer(uint32_t width, uint32_t height)
     : window_w(width), window_h(height), fragment_shader(FragmentShader), vertex_shader(VertexShader),
-      zbuffer(std::make_unique<ZBuffer>(width, height))
+      zbuffer(std::make_unique<ZBuffer>(width, height)),
+      scan_zbuffer(std::make_unique<ScanZBuffer>(width,height))
 {
     zbuffer->traverseQuadTree();
 }
