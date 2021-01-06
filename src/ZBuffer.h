@@ -43,7 +43,15 @@ class Bound2
     {
         return bound.containing(*this);
     }
-    bool intersect(const Bound2 &bound) const;
+    bool intersect(const Bound2 &bound) const{
+        if(std::max(min_point.x,bound.min_point.x)<=std::min(max_point.x,bound.max_point.x) &&
+            std::min(max_point.y,bound.max_point.y)>=std::max(min_point.y,bound.min_point.y))
+            return true;
+        else return false;
+    }
+    bool intersect(const Triangle& tri){
+        return intersect(Bound2(tri));
+    }
     void union_(const Bound2 &bound)
     {
         min_point.x = std::min(min_point.x, bound.min_point.x);

@@ -41,7 +41,7 @@ class Triangle
     }
     void setTexCoord(uint8_t index, const glm::vec2 &t);
     void setTexCoord(uint8_t index, float x, float y);
-    const std::array<glm::vec2, 3> &getTexCoords() const
+    [[nodiscard]] const std::array<glm::vec2, 3> &getTexCoords() const
     {
         return tex_coord;
     }

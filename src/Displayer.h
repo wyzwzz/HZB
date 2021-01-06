@@ -30,7 +30,7 @@ class Displayer
 
         SDL_CHECK
 
-        camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 10.0f));
+        camera = std::make_unique<Camera>(glm::vec3(0.6f, 5.0f, 30.0f));
 
         /**
          * init rasterizer
@@ -60,7 +60,6 @@ class Displayer
     uint32_t w;
     uint32_t h;
     SDL_Renderer *renderer;
-
     std::unique_ptr<Camera> camera;
 
     std::vector<std::unique_ptr<RenderOBJ>> render_obj_list;

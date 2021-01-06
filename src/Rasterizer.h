@@ -92,6 +92,7 @@ class Rasterizer
     void setPixel(int x, int y, glm::vec4 pixel_color);
 
     uint32_t window_w, window_h;
+    Bound2 window_bound;
 };
 
 #endif // HIERARCHICAL_Z_BUFFER_RASTERIZER_H

@@ -32,7 +32,7 @@ class Camera
         : pos(camera_pos), up(glm::vec3(0.0f, 1.0f, 0.0f)), front(glm::vec3(0.0f, 0.0f, -1.0f)),
           //        right(glm::vec3(1.0f,0.0f,0.0f)),
           world_up(glm::vec3(0.0f, 1.0f, 0.0f)), yaw(-90.0f), pitch(0.0f), move_speed(0.03f), mouse_sensitivity(0.1f),
-          zoom(20.0f)
+          zoom(45.0f)
     {
         updateCameraVectors();
     }

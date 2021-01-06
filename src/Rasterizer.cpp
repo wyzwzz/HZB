@@ -11,7 +11,8 @@
 Rasterizer::Rasterizer(uint32_t width, uint32_t height)
     : window_w(width), window_h(height), fragment_shader(FragmentShader), vertex_shader(VertexShader),
       zbuffer(std::make_unique<ZBuffer>(width, height)),
-      scan_zbuffer(std::make_unique<ScanZBuffer>(width,height))
+      scan_zbuffer(std::make_unique<ScanZBuffer>(width,height)),
+      window_bound({{0,0},{width,height}})
 {
     zbuffer->traverseQuadTree();
 }
@@ -176,7 +177,10 @@ void Rasterizer::raster()
         n_tri.setVertex(0, v[0]);
         n_tri.setVertex(1, v[1]);
         n_tri.setVertex(2, v[2]);
-        rasterize(n_tri);
+        if(window_bound.intersect(n_tri)){
+            rasterize(n_tri);
+            scan_zbuffer->addTriangle(std::move(n_tri));
+        }
     };
 //#define OCTTREE
 //#define ZTEST
@@ -269,6 +273,7 @@ void Rasterizer::raster()
               <<" draw leaf node num: "<<draw_leaf_node_num<<std::endl;
 #endif
 #else
+    scan_zbuffer->init();
     for (auto e : all_triangles)
     {
         auto tris = std::get<0>(e);
@@ -281,6 +286,7 @@ void Rasterizer::raster()
 #define USE_LAMBDA
 #ifdef USE_LAMBDA
             transform_triangle(&tris[i]);
+
 #else
             Triangle tri = tris[i];
             //            tri.setNormal(0,tri.getVertex(0));
@@ -327,6 +333,8 @@ void Rasterizer::raster()
 #endif
         }
     }
+    scan_zbuffer->scaningRaster();
+    scan_zbuffer->finish();
     //    zbuffer->printRootDepth();
 #endif
 }
@@ -364,10 +372,9 @@ void Rasterizer::rasterize(const Triangle &tri)
     auto &color = tri.getColors();
     auto &normal = tri.getNormals();
     auto &tex_coord = tri.getTexCoords();
-    //    std::cout<<normal[0][0]<<" "<<normal[0][1]<<" "<<normal[0][2]<<" "
-    //            <<normal[1][0]<<" "<<normal[1][1]<<" "<<normal[1][2]<<" "
-    //            <<normal[2][0]<<" "<<normal[2][1]<<"
-    //            "<<normal[2][2]<<std::endl;
+//        std::cout<<v[0][0]<<" "<<v[0][1]<<" "<<v[0][2]<<" "
+//                <<v[1][0]<<" "<<v[1][1]<<" "<<v[1][2]<<" "
+//                <<v[2][0]<<" "<<v[2][1]<<" "<<v[2][2]<<std::endl;
     /**
      * todo: hierarchical z buffer test
      */
@@ -391,6 +398,7 @@ void Rasterizer::rasterize(const Triangle &tri)
     {
         for (int j = left; j < right; j++)
         {
+//            std::cout<<"in loop!!!!!!!"<<std::endl;
             if (insideTriangle(j + 0.5f, i + 0.5f, v))
             {
                 auto [alpha, beta, gamma] = computeBarycentric2D(j + 0.5, i + 0.5, v);

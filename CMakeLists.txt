@@ -16,4 +16,5 @@ target_link_libraries(Hierarchical_Z_Buffer PRIVATE
         SDL2 OpenMP::OpenMP_CXX)
 
 target_include_directories(Hierarchical_Z_Buffer PRIVATE
-        ./third_party/sdl2-2.0.3/include ./third_party/tinyobjloader)
+        ./third_party/sdl2-2.0.3/include ./third_party/tinyobjloader
+        ./third_party/eigen)
