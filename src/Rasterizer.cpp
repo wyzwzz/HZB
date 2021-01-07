@@ -178,8 +178,8 @@ void Rasterizer::raster()
         n_tri.setVertex(1, v[1]);
         n_tri.setVertex(2, v[2]);
         if(window_bound.intersect(n_tri)){
-//            rasterize(n_tri);
-            scan_zbuffer->addTriangle(std::move(n_tri));
+            rasterize(n_tri);
+//            scan_zbuffer->addTriangle(std::move(n_tri));
         }
     };
 //#define OCTTREE
@@ -437,8 +437,8 @@ void Rasterizer::rasterize(const Triangle &tri)
 
 std::vector<uint8_t> &Rasterizer::getPixels()
 {
-    return scan_zbuffer->getPixels();
-//    return pixels;
+//    return scan_zbuffer->getPixels();
+    return pixels;
 }
 
 void Rasterizer::setViewPos(const glm::vec3 &view_pos)
