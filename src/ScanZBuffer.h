@@ -84,7 +84,7 @@ class ScanZBuffer{
     void deleteActiveEdgeTable(ActiveEdgeTable*);
     ClassfiedEdgeTable* findClassfiedEdgeTable(int h,uint32_t id);
     ActiveEdgeTable* active_edge_table;
-
+    int add_cnt;
 };
 
 #endif // HIERARCHICAL_Z_BUFFER_SCANZBUFFER_H
