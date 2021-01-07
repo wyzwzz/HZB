@@ -146,9 +146,9 @@ void Rasterizer::raster_node(const OctNode* node,const glm::mat4& mvp)
 }
 void Rasterizer::raster()
 {
-    pixels.assign(window_w * window_h * 4, 0.f);
+    pixels.assign(window_w * window_h * 4, 0);
     depth_buffer.assign(window_h * window_w, 1024.f);
-    zbuffer->init();
+//    zbuffer->init();
 
 
 
@@ -178,7 +178,7 @@ void Rasterizer::raster()
         n_tri.setVertex(1, v[1]);
         n_tri.setVertex(2, v[2]);
         if(window_bound.intersect(n_tri)){
-            rasterize(n_tri);
+//            rasterize(n_tri);
             scan_zbuffer->addTriangle(std::move(n_tri));
         }
     };
@@ -437,7 +437,8 @@ void Rasterizer::rasterize(const Triangle &tri)
 
 std::vector<uint8_t> &Rasterizer::getPixels()
 {
-    return pixels;
+    return scan_zbuffer->getPixels();
+//    return pixels;
 }
 
 void Rasterizer::setViewPos(const glm::vec3 &view_pos)

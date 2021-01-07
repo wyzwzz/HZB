@@ -15,14 +15,13 @@ void ScanZBuffer::init()
     classfied_polygon_table.assign(h, nullptr);
     classfied_edge_table.assign(h, nullptr);
     depth_buffer.assign(w,1024.f);
-    pixels.assign(w * h * 4, 0.f);
+    pixels.assign(w * h * 4, 0);
     active_polygon_table= nullptr;
     active_edge_table= nullptr;
 }
 std::vector<uint8_t> &ScanZBuffer::getPixels()
 {
     return this->pixels;
-    triangles.clear();
 }
 
 void ScanZBuffer::addTriangle(Triangle &&tri)
@@ -45,7 +44,7 @@ void ScanZBuffer::addTriangle(Triangle &&tri)
     polygon->b=n[1];
     polygon->c=n[2];
     polygon->d=d;
-    auto& tri_color=tri.getColors();
+    auto& tri_color=tri.getNormals();
     polygon->color={tri_color[0][0],tri_color[0][1],tri_color[0][2]};
     float max_y=std::max(v[0].y,std::max(v[1].y,v[2].y));
     polygon->dy=max_y-std::min(v[0].y,std::min(v[1].y,v[2].y));
@@ -161,18 +160,14 @@ void ScanZBuffer::scaningRaster()
                 p=p->next;
             }
         }//endif for search new active polygon
-        updateActivePolygonTable();
+
         auto p_act_edge=active_edge_table;
         while(p_act_edge!=nullptr){
             float zx=p_act_edge->zl;
             for(int x=p_act_edge->xl;x<=p_act_edge->xr;x++){
                 if(zx<depth_buffer[x]){
                     depth_buffer[x]=zx;
-                    auto idx=(cur_h*h+x)*4;
-                    pixels[idx]=p_act_edge->color[0];
-                    pixels[idx+1]=p_act_edge->color[1];
-                    pixels[idx+2]=p_act_edge->color[2];
-                    pixels[idx+3]=0.f;
+                    setPixel(x,cur_h,p_act_edge->color);
                 }
                 zx+=p_act_edge->dzx;
             }
@@ -185,8 +180,13 @@ void ScanZBuffer::scaningRaster()
 //                std::cout<<"update left active edge"<<std::endl;
                 p_act_edge=p_act_edge->next;//???
                 if(inActivePolygonTable(id)){
-
-
+                    auto e=findClassfiedEdgeTable(cur_h,id);
+                    if(e!=nullptr){//update active_edge_table
+                        cur_p_act_edge->xl=e->x;
+                        cur_p_act_edge->dxl=e->dx;
+                        cur_p_act_edge->dyl=e->dy;
+                        cur_p_act_edge->zl+=(cur_p_act_edge->dzx*cur_p_act_edge->dxl+cur_p_act_edge->dzy);
+                    }
                 }
                 else{
                     deleteActiveEdgeTable(cur_p_act_edge);
@@ -197,6 +197,11 @@ void ScanZBuffer::scaningRaster()
                 p_act_edge=p_act_edge->next;
                 if(inActivePolygonTable(id)){
                     auto e=findClassfiedEdgeTable(cur_h,id);
+                    if(e!= nullptr){
+                        cur_p_act_edge->xr=e->x;
+                        cur_p_act_edge->dxr=e->dx;
+                        cur_p_act_edge->dyr=e->dy;
+                    }
                 }
                 else{
                     deleteActiveEdgeTable(cur_p_act_edge);
@@ -210,7 +215,7 @@ void ScanZBuffer::scaningRaster()
             p_act_edge=p_act_edge->next;
         }
 
-
+        updateActivePolygonTable();
     }//end loop for h rows
     traverseTable<ActivePolygonTable*>(active_polygon_table);
     if(active_polygon_table!=nullptr){
@@ -341,8 +346,10 @@ bool ScanZBuffer::inActivePolygonTable(uint32_t id)
 {
     auto p=active_polygon_table;
     while(p!= nullptr){
-        if(p->id==id)
+        if(p->id==id){
+//            std::cout<<__FUNCTION__ <<": "<<p->dy<<std::endl;
             return true;
+        }
         p=p->next;
     }
     return false;
@@ -375,10 +382,27 @@ ClassfiedEdgeTable *ScanZBuffer::findClassfiedEdgeTable(int h, uint32_t id)
     auto p=classfied_edge_table[h];
     while(p!=nullptr){
         if(p->id==id){
-            std::cout<<"find"<<std::endl;
+//            std::cout<<"h: "<<h<<std::endl;
+//            std::cout<<"find: "<<p->dy<<std::endl;
             return p;
         }
         p=p->next;
     }
-    throw std::runtime_error("not find classfied_edge_table");
+//    auto polygon=findActivePolygonByID(id);
+//    if(polygon!=nullptr){
+//        std::cout<<"polygon: "<<polygon->dy<<std::endl;
+//    }
+//////    std::cout<<"not find classfied_edge_table"<<std::endl;
+//////    std::cout<<"h: "<<h<<std::endl;
+//    else
+//        throw std::runtime_error("not find classfied_edge_table");
+    return nullptr;
+}
+void ScanZBuffer::setPixel(int x, int y,std::array<float,3>& color)
+{
+    uint32_t idx = 4 * ((h - 1 - y) * w + x);
+    pixels[idx] = color[0] * 255;
+    pixels[idx + 1] = color[1] * 255;
+    pixels[idx + 2] = color[2] * 255;
+    pixels[idx + 3] = 255;
 }

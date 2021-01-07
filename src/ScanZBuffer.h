@@ -64,6 +64,7 @@ class ScanZBuffer{
     void scaningRaster();
   private:
     uint32_t w,h;
+    void setPixel(int x,int y,std::array<float,3>& color);
     std::vector<uint8_t> pixels;
     std::vector<float> depth_buffer;
 
