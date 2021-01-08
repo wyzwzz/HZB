@@ -3,7 +3,7 @@
 //
 #include "Displayer.h"
 #include <iostream>
-int main()
+int main(int argc,char** argv)
 {
     std::cout << "Hierarchical Z-Buffer" << std::endl;
     Displayer displayer(1024, 1024);
@@ -25,4 +25,5 @@ int main()
 //    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
 //    displayer.addRenderOBJ("./nanosuit/nanosuit.obj");
     displayer.render();
+    return 0;
 }

@@ -5,7 +5,7 @@
 #ifndef HIERARCHICAL_Z_BUFFER_UTIL_H
 #define HIERARCHICAL_Z_BUFFER_UTIL_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

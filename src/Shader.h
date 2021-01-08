@@ -20,6 +20,7 @@ struct fragment_shader_in
 
 inline glm::vec4 VertexShader(vertex_shader_in v_in)
 {
+    return {};
 }
 inline glm::vec4 FragmentShader(fragment_shader_in f_in)
 {

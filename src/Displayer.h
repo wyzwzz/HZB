@@ -9,7 +9,7 @@
 #include "Rasterizer.h"
 #include "RenderOBJ.h"
 #include "Util.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <memory>
 #include <stdexcept>
 /**

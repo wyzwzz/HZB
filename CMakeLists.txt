@@ -23,7 +23,7 @@ elseif(UNIX AND NOT APPLE)
         message(STATUS ${ARCH_64} ${LINUX} ${CMAKE_SYSTEM_NAME})
     endif()
 endif()
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
 aux_source_directory(${CMAKE_SOURCE_DIR}/src SRC)
 
 add_executable(Hierarchical_Z_Buffer ${SRC})
