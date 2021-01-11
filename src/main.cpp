@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     {
         if (std::string(argv[3]) == "-l")
         {
-            use_scanline_zbuffer = false;
+            use_scanline_zbuffer = true;
         }
         else if (std::string(argv[3]) == "-h")
         {

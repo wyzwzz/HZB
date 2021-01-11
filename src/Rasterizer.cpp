@@ -124,7 +124,7 @@ void Rasterizer::raster_node(const OctNode *node, const glm::mat4 &mvp)
     {
         if (node->isLeafNode())
         {
-            draw_tri_num += node->triangles.size();
+//            draw_tri_num += node->triangles.size();
             draw_leaf_node_num++;
             for (auto triangle : node->triangles)
             {
@@ -145,6 +145,7 @@ void Rasterizer::raster_node(const OctNode *node, const glm::mat4 &mvp)
 }
 void Rasterizer::raster()
 {
+    draw_tri_num = draw_leaf_node_num = 0;
     pixels.assign(window_w * window_h * 4, 0);
     depth_buffer.assign(window_h * window_w, 1024.f);
     if (use_hierarchical_zbuffer)
@@ -185,7 +186,7 @@ void Rasterizer::raster()
     {
 #define USE_RECURSIVE
 #ifdef USE_RECURSIVE
-        draw_tri_num = draw_leaf_node_num = 0;
+
         raster_node(scene->getRoot(), mvp);
         std::cout << "draw tri num: " << draw_tri_num << " draw leaf node num: " << draw_leaf_node_num << std::endl;
 #else
@@ -282,6 +283,7 @@ void Rasterizer::raster()
             scan_zbuffer->finish();
         }
     }
+    std::cout<<"draw triangle num: "<<draw_tri_num<<std::endl;
 }
 
 std::tuple<float, float, float> computeBarycentric2D(float x, float y, const std::array<glm::vec4, 3> &v)
@@ -321,7 +323,7 @@ void Rasterizer::rasterize(const Triangle &tri)
     if (use_hierarchical_zbuffer)
         if (!zbuffer->ZTest(tri))
             return;
-
+    draw_tri_num++;
     /**
      * first get the triangle's bounding box
      * second get the intersection of bounding box with the viewport window
