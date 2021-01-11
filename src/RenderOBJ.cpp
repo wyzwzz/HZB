@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #define OBJ_HAVE_NORMAL
 #define OBJ_HAVE_TEXCOORD
+
 int offset=0;
 RenderOBJ::RenderOBJ(std::string obj_file_path)
 {
@@ -76,7 +77,7 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
                 tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
                 tri.setTexCoord(v, tx, ty);
 #endif
-#ifdef OBJ_HABE_COLOR
+#ifdef OBJ_HAVE_COLOR
                 tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
                 tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
                 tinyobj::real_t blue = attrib.colors[3 * idx.vertex_index + 2];
@@ -104,6 +105,3 @@ std::tuple<const Triangle *, size_t> RenderOBJ::getTriangleList()
     return std::make_tuple(triangle_list.data(), triangle_list.size());
 }
 
-void RenderOBJ::calNormals()
-{
-}

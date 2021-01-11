@@ -12,8 +12,9 @@
 #include <SDL.h>
 #include <memory>
 #include <stdexcept>
+
 /**
- * Using SDL2 to create window and display
+ * @brief Using SDL2 to create window and display
  */
 class Displayer
 {
@@ -27,17 +28,15 @@ class Displayer
         }
         SDL_EXPR(window = SDL_CreateWindow("Hierarchical Z-Buffer", 100, 100, w, h, SDL_WINDOW_SHOWN));
         SDL_EXPR(renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
-
         SDL_CHECK
 
-        camera = std::make_unique<Camera>(glm::vec3(0.6f, 5.0f, 30.0f));
+        camera = std::make_unique<Camera>(glm::vec3(0.f, 10.0f, 15.0f));
 
         /**
          * init rasterizer
          * set mode view projection matrix
          */
         rasterizer = std::make_unique<Rasterizer>(w, h);
-
         float scale = 1.0f;
         rasterizer->setModel(glm::scale(glm::mat4(1.0f), glm::vec3(scale, scale, scale)));
         rasterizer->setView(camera->getViewMatrix());
@@ -52,7 +51,15 @@ class Displayer
     }
 
   public:
+    /**
+     * @brief load a render object to obj list from an obj file
+     * @see class RenderOBJ
+     */
     void addRenderOBJ(std::string obj_file_name);
+
+    /**
+     * @brief process PollEvent and raster obj in render_obj_list for each frame, update SDL_Texture and present
+     */
     void render();
 
   private:
@@ -60,9 +67,22 @@ class Displayer
     uint32_t w;
     uint32_t h;
     SDL_Renderer *renderer;
+
+    /**
+     * camera for process mouse and keyboard input
+     */
     std::unique_ptr<Camera> camera;
 
+    /**
+     * list for render object
+     * @see class RenderOBJ
+     */
     std::vector<std::unique_ptr<RenderOBJ>> render_obj_list;
+
+    /**
+     * instance for rastering triangle
+     * @see class Rasterizer
+     */
     std::unique_ptr<Rasterizer> rasterizer;
 };
 

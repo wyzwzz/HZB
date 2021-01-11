@@ -8,13 +8,18 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
+/**
+ * @brief load triangles from obj file, using third-party: tiny_obj_loader
+ */
 class RenderOBJ
 {
   public:
     RenderOBJ(std::string obj_file_path);
 
     std::tuple<const Triangle *, size_t> getTriangleList();
-    void calNormals();
+
+    void calNormals() = delete;
 
   private:
     std::vector<Triangle> triangle_list;

@@ -1,6 +1,9 @@
 //
 // Created by wyz on 20-12-6.
 //
+/**
+ * @headerfile this file including some helpful function and marco for coding
+ */
 
 #ifndef HIERARCHICAL_Z_BUFFER_UTIL_H
 #define HIERARCHICAL_Z_BUFFER_UTIL_H
@@ -10,18 +13,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-inline glm::mat4 GetModelMatrix()
-{
-}
-
-inline glm::mat4 GetViewMatrix()
-{
-}
-
-template <typename T> inline glm::mat4 GetProjectionMatrix(T fov, T aspect, T z_naer, T z_far)
-{
-    return glm::perspective(fov, aspect, z_naer, z_far);
-}
 
 template <typename T> T min4(T x1, T x2, T x3, T x4)
 {
@@ -46,18 +37,15 @@ template <typename T> T max4(T x1, T x2, T x3, T x4)
     return max_;
 }
 
-template <class T>
-void print(T t)
+template <class T> void print(T t)
 {
-    std::cout<<t<<std::endl;
+    std::cout << t << std::endl;
 }
-template <class T,class... Args>
-void print(T t,Args... args)
+template <class T, class... Args> void print(T t, Args... args)
 {
-    std::cout<<t<<" ";
+    std::cout << t << " ";
     print(args...);
 }
-
 
 #define DEBUG
 #ifdef DEBUG

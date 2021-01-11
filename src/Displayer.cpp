@@ -93,17 +93,14 @@ void Displayer::render()
         }
     };
 
-    /**
-     * pass all render obj's triangles to resterizer
-     */
+    // pass all render obj's triangles to resterizer
     for (auto &p : render_obj_list)
     {
         rasterizer->addTriangleList(p->getTriangleList());
     }
     rasterizer->buildSceneOctTree();
-    /**
-     * render loop
-     */
+
+    // main render loop
     auto last = std::chrono::steady_clock::now();
     while (!exit)
     {
@@ -112,7 +109,7 @@ void Displayer::render()
         auto current = std::chrono::steady_clock::now();
         auto t = std::chrono::duration_cast<std::chrono::milliseconds>(current - last);
         last = current;
-        std::cout << "Cost time: " << t.count() << "ms" << std::endl;
+        std::cout << "Render one frame cost time: " << t.count() << "ms" << std::endl;
 
         rasterizer->raster();
 

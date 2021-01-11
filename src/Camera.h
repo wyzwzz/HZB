@@ -2,13 +2,16 @@
 // Created by wyz on 20-12-8.
 //
 
-#ifndef VOLUMERENDERER_CAMERA_H
-#define VOLUMERENDERER_CAMERA_H
+#ifndef HIERARCHICAL_Z_BUFFER_CAMERA_H
+#define HIERARCHICAL_Z_BUFFER_CAMERA_H
+#include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-#include <math.h>
 
+/**
+ * @brief class for provide view matrix
+ */
 class Camera
 {
   public:
@@ -30,7 +33,6 @@ class Camera
   public:
     Camera(glm::vec3 camera_pos)
         : pos(camera_pos), up(glm::vec3(0.0f, 1.0f, 0.0f)), front(glm::vec3(0.0f, 0.0f, -1.0f)),
-          //        right(glm::vec3(1.0f,0.0f,0.0f)),
           world_up(glm::vec3(0.0f, 1.0f, 0.0f)), yaw(-90.0f), pitch(0.0f), move_speed(0.03f), mouse_sensitivity(0.1f),
           zoom(45.0f)
     {
@@ -101,7 +103,6 @@ inline void Camera::processMovementByKeyboard(CameraMoveDirection direction, flo
 }
 inline void Camera::processMouseMovement(float xoffset, float yoffset)
 {
-    //    std::cout<<__FUNCTION__ <<std::endl;
     yaw += xoffset * mouse_sensitivity;
     pitch += yoffset * mouse_sensitivity;
     if (pitch > 60.0f)
@@ -112,7 +113,6 @@ inline void Camera::processMouseMovement(float xoffset, float yoffset)
 }
 inline void Camera::processMouseScroll(float yoffset)
 {
-    //    std::cout<<__FUNCTION__ <<std::endl;
     zoom -= yoffset;
     if (zoom < 0.1f)
         zoom = 0.1f;
@@ -121,7 +121,6 @@ inline void Camera::processMouseScroll(float yoffset)
 }
 inline void Camera::processKeyboardForArgs(CameraDefinedKey arg)
 {
-    //    std::cout<<__FUNCTION__ <<std::endl;
     if (arg == CameraDefinedKey::FASTER)
         move_speed *= 2;
     else if (arg == CameraDefinedKey::SLOWER)
@@ -138,4 +137,4 @@ inline void Camera::updateCameraVectors()
     up = glm::normalize(glm::cross(right, front));
 }
 
-#endif // VOLUMERENDERER_CAMERA_H
+#endif

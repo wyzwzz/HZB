@@ -5,14 +5,14 @@
 #ifndef HIERARCHICAL_Z_BUFFER_RASTERIZER_H
 #define HIERARCHICAL_Z_BUFFER_RASTERIZER_H
 
+#include "OctTree.h"
+#include "ScanZBuffer.h"
 #include "Shader.h"
 #include "Triangle.h"
 #include "ZBuffer.h"
 #include <functional>
 #include <tuple>
 #include <vector>
-#include "OctTree.h"
-#include "ScanZBuffer.h"
 class Rasterizer
 {
   public:
@@ -35,10 +35,9 @@ class Rasterizer
     std::vector<uint8_t> &getPixels();
 
   private:
-
     void rasterize(const Triangle &tri);
 
-    void raster_node(const OctNode* node,const glm::mat4& mvp);
+    void raster_node(const OctNode *node, const glm::mat4 &mvp);
 
   private:
     /**
@@ -46,6 +45,7 @@ class Rasterizer
      * triangles array's pointer
      */
     std::vector<std::tuple<const Triangle *, size_t>> all_triangles;
+
     /**
      * transfer matrix
      */
@@ -65,9 +65,7 @@ class Rasterizer
      * Process each input vertex
      */
     std::function<glm::vec4(vertex_shader_in)> vertex_shader;
-    std::function<void(const Triangle* tri)> transform_triangle;
-
-
+    std::function<void(const Triangle *tri)> transform_triangle;
 
     /**
      * scaning-line z-buffer algorithm.
@@ -80,10 +78,12 @@ class Rasterizer
      */
     std::unique_ptr<OctTree> scene;
     std::unique_ptr<ZBuffer> zbuffer;
+
     /**
      * simple z-buffer
      */
     std::vector<float> depth_buffer;
+
     /**
      * Store the final pixels' color (RGBA:0-255)
      */

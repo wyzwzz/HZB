@@ -12,6 +12,11 @@
 #include <map>
 #include <memory>
 #include <vector>
+
+/**
+ * @brief 2-dim bound for accelerate triangle intersection test
+ * @see class Bound3
+ */
 class Bound2
 {
   public:
@@ -73,6 +78,7 @@ class Bound2
     }
     glm::vec2 min_point, max_point;
 };
+
 inline Bound2 Union(const Bound2 &b1, const Bound2 &b2, const Bound2 &b3, const Bound2 &b4)
 {
     float min_x = min4(b1.min_point.x, b2.min_point.x, b3.min_point.x, b4.min_point.x);
@@ -94,11 +100,16 @@ inline Bound2 intersection(const Bound2& b,const glm::vec2& min_p,const glm::vec
     return {{std::max(b.min_point.x,min_p.x),std::max(b.min_point.y,min_p.y)},
             {std::min(b.max_point.x,max_p.x),std::min(b.max_point.y,max_p.y)}};
 }
+
+/**
+ * @brief QuadTree node for hierarchical z-buffer
+ */
 class QuadNode
 {
   public:
     QuadNode(const glm::vec2 &min_, const glm::vec2 &max_)
         : childs({nullptr, nullptr, nullptr, nullptr}), parent(nullptr), bound(Bound2(min_, max_)), z_depth(0.f){};
+    //build down-to-up
     QuadNode(QuadNode *n1, QuadNode *n2, QuadNode *n3, QuadNode *n4)
     {
         if (n1 != nullptr)
@@ -140,9 +151,13 @@ class QuadNode
     QuadNode *parent;
     Bound2 bound;
     float z_depth;
-    int flag = -1;
+    int flag = -1;//represent level in quadtree
 };
 
+/**
+ * @brief implement for hierarchical z-buffer algorithm
+ * @see class QctTree
+ */
 class ZBuffer
 {
   public:
@@ -150,9 +165,16 @@ class ZBuffer
 
     bool ZTest(const Triangle &tri);
     bool ZTest(const Bound2& b,float depth);
-    void traverseQuadTree();
+
     void init();
+
     void setZBuffer(uint32_t row, uint32_t col, float d);
+
+    void updateZBuffer(const QuadNode *node);
+
+    void traverseQuadTree();
+
+  public:
     void printRootDepth()
     {
         std::cout << "root depth: " << root->z_depth << std::endl;
@@ -168,8 +190,9 @@ class ZBuffer
 
   private:
     uint32_t w,h;
-    void updateZBuffer(const QuadNode *node);
+
     QuadNode *root;
+
     std::vector<std::vector<QuadNode *>> reserve_nodes;
 };
 
