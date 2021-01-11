@@ -17,7 +17,7 @@ RenderOBJ::RenderOBJ(std::string obj_file_path)
 {
     START_TIMER
     tinyobj::ObjReaderConfig reader_config;
-    reader_config.mtl_search_path = "./nanosuit";
+//    reader_config.mtl_search_path = "./nanosuit";
 
     tinyobj::ObjReader reader;
 
