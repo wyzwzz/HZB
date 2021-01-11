@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     Displayer displayer(1024, 1024);
 
     if (use_hzb_octtree)
-    { // for testing octg tree acceleration
+    { // for testing oct tree acceleration
         displayer.addRenderOBJ("wall/wall.obj");
     }
     for (size_t i = 0; i < num; i++)
